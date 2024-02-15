@@ -1,0 +1,60 @@
+#aws cli commands to create ecs (fargate) cluster using cloudformation templates
+#note: replace the values present in <> (ex: <your-vpc-id>) with your own values
+
+#create ecs cluster
+aws cloudformation create-stack \
+    --stack-name test-cluster \
+    --template-body file://1-ecs-create-cluster.yaml \
+    --parameters ParameterKey=ECSClusterName,ParameterValue=test-cluster \
+
+#create log group for ecs task definition
+aws cloudformation create-stack \
+    --stack-name test-td-log-group \
+    --template-body file://2-ecs-create-log-group.yaml \
+    --parameters ParameterKey=TaskDefinitionName,ParameterValue=test-td \
+
+#create task definition
+aws cloudformation create-stack \
+    --stack-name test-td \
+    --template-body file://3-ecs-create-task-definition.yaml \
+    --parameters ParameterKey=TaskDefinitionFamily,ParameterValue=test-td \
+                 ParameterKey=ContainerName,ParameterValue=docker-2048 \
+                 ParameterKey=ImageURI,ParameterValue=alexwhen/docker-2048:latest \
+                 ParameterKey=ContainerCpu,ParameterValue=512 \
+                 ParameterKey=ContainerPort,ParameterValue=80 \
+                 ParameterKey=HostPort,ParameterValue=80 \
+                 ParameterKey=TaskCpu,ParameterValue=512 \
+                 ParameterKey=TaskMemory,ParameterValue=1024 \
+
+#create target group
+aws cloudformation create-stack \
+    --stack-name test-tg \
+    --template-body file://4-ecs-create-target-group.yaml \
+    --parameters ParameterKey=TargetGroupName,ParameterValue=test-tg \
+                 ParameterKey=Port,ParameterValue=80 \
+                 ParameterKey=VpcId,ParameterValue=<your-vpc-id> \
+
+#create security group
+aws cloudformation create-stack \
+    --stack-name test-sg \
+    --template-body file://5-ecs-create-security-group.yaml \
+    --parameters ParameterKey=SecurityGroupName,ParameterValue=test-sg \
+                 ParameterKey=VpcCidrIp,ParameterValue=<your-vpc-cidr-ip> \
+                 ParameterKey=ApplicationPort,ParameterValue=8001 \
+                 ParameterKey=ApplicationName,ParameterValue=docker-2048 \
+                 ParameterKey=VpcId,ParameterValue=<your-vpc-id> \
+
+#create ecs service
+aws cloudformation create-stack \
+    --stack-name test-service \
+    --template-body file://6-ecs-create-frontend-service.yaml \
+    --parameters ParameterKey=ECSClusterName,ParameterValue=test-cluster \
+                 ParameterKey=TaskDefinitionFamily,ParameterValue=<created-td-arn> \
+                 ParameterKey=ECSServiceName,ParameterValue=test-service \
+                 ParameterKey=DesiredCount,ParameterValue=1 \
+                 ParameterKey=ContainerName,ParameterValue=docker-2048 \
+                 ParameterKey=ContainerPort,ParameterValue=80 \
+                 ParameterKey=TargetGroupArn,ParameterValue=<created-tg-arn> \
+                 ParameterKey=HealthCheckGracePeriodSeconds,ParameterValue=20 \
+                 ParameterKey=SecurityGroupIDs,ParameterValue=<created-sg-id> \
+                 ParameterKey=SubnetIDs,ParameterValue=\"<your-subnet-1>,<your-subnet-2>,<your-subnet-3>\" \

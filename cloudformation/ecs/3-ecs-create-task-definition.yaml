@@ -1,0 +1,59 @@
+AWSTemplateFormatVersion: 2010-09-09
+Description: ECS Task Definition
+Parameters:
+  TaskDefinitionFamily:
+    Type: String
+  ContainerName:
+    Type: String
+  ImageURI:
+    Type: String
+  ContainerCpu:
+    Type: Number
+  ContainerPort:
+    Type: Number
+  HostPort:
+    Type: Number
+  TaskCpu:
+    Type: String
+  TaskMemory:
+    Type: String
+Resources:
+  ECSTaskDefinition:
+    Type: 'AWS::ECS::TaskDefinition'
+    Properties:
+      Family: !Ref TaskDefinitionFamily
+      ContainerDefinitions:
+        - Name: !Ref ContainerName
+          Image: !Ref ImageURI
+          Cpu: !Ref ContainerCpu
+          PortMappings:
+            - Name: 
+                Fn::Sub: ${ContainerName}-${ContainerPort}-tcp
+              ContainerPort: !Ref ContainerPort
+              HostPort: !Ref HostPort
+              Protocol: tcp
+              AppProtocol: http
+          Essential: true
+          Environment: []
+          EnvironmentFiles: []
+          MountPoints: []
+          VolumesFrom: []
+          Ulimits: []
+          LogConfiguration:
+            LogDriver: awslogs
+            Options:
+              awslogs-group: 
+                Fn::Sub: /ecs/${TaskDefinitionFamily}
+              awslogs-region: <your-aws-region>
+              awslogs-stream-prefix: ecs
+            SecretOptions: []
+      TaskRoleArn: 'arn:aws:iam::<your-aws-acc-id>:role/ecsTaskExecutionRole'
+      ExecutionRoleArn: 'arn:aws:iam::<your-aws-acc-id>:role/ecsTaskExecutionRole'
+      NetworkMode: awsvpc
+      RequiresCompatibilities:
+        - FARGATE
+      Cpu: !Ref TaskCpu
+      Memory: !Ref TaskMemory
+      RuntimePlatform:
+        CpuArchitecture: X86_64
+        OperatingSystemFamily: LINUX
