@@ -1,0 +1,12 @@
+#backup aws application type load balancer using aws cli commands
+#replace the values present inside <> (ex: <load-balancer-arn>) with your own values
+
+#describe load balancers
+aws elbv2 describe-load-balancers --load-balancer-arns <load-balancer-arn> --output json > <backup-name>-<load-balancer-name>-description.json
+
+#describe listeners
+aws elbv2 describe-listeners --load-balancer-arn <load-balancer-arn> --output json > <backup-name>-<load-balancer-name>-listeners-description.json
+
+#describe rules
+aws elbv2 describe-rules --listener-arn "<http-listener-arn>" --output json > <backup-name>-<load-balancer-name>-http-rules.json
+aws elbv2 describe-rules --listener-arn "<https-listener-arn>" --output json > <backup-name>-<load-balancer-name>-https-rules.json
