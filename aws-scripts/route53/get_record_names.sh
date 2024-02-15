@@ -1,4 +1,4 @@
-#get route53 'A' type record names
+#get route53 'A' type record names across all hosted zones
 records=()
 all_hosted_zones=$(aws route53 list-hosted-zones --query "HostedZones[*].Id")
 hosted_zone_ids=$(echo $all_hosted_zones | tr -d [,'"'/hostedzone/])
