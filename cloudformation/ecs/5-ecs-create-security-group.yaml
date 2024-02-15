@@ -1,0 +1,32 @@
+AWSTemplateFormatVersion: 2010-09-09
+Description: Security group for an ECS Service
+Parameters:
+  SecurityGroupName:
+    Type: String
+  VpcCidrIp:
+    Type: String
+  ApplicationPort:
+    Type: Number
+  ApplicationName:
+    Type: String
+  VpcId:
+    Type: String
+Resources:
+  MySecurityGroup:
+    Type: 'AWS::EC2::SecurityGroup'
+    Properties:
+      GroupName: !Ref SecurityGroupName
+      SecurityGroupIngress:
+        - CidrIp: !Ref VpcCidrIp
+          FromPort: 80
+          ToPort: 80
+          IpProtocol: tcp
+          Description: VPC (HTTP)
+        - CidrIp: !Ref VpcCidrIp
+          FromPort: !Ref ApplicationPort
+          ToPort: !Ref ApplicationPort
+          IpProtocol: tcp
+          Description: VPC (Application)
+      GroupDescription: 
+        Fn::Sub: allows access to ${ApplicationName}
+      VpcId: !Ref VpcId

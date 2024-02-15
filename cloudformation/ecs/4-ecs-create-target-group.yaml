@@ -1,0 +1,19 @@
+AWSTemplateFormatVersion: 2010-09-09
+Description: Target group for an ECS Service
+Parameters:
+  TargetGroupName:
+    Type: String
+  Port:
+    Type: Number
+  VpcId:
+    Type: String
+Resources:
+  MyTargetGroup:
+    Type: 'AWS::ElasticLoadBalancingV2::TargetGroup'
+    Properties:
+      Name: !Ref TargetGroupName
+      Port: !Ref Port
+      Protocol: HTTP
+      ProtocolVersion: HTTP1
+      VpcId: !Ref VpcId
+      TargetType: ip

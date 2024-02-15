@@ -1,0 +1,57 @@
+AWSTemplateFormatVersion: 2010-09-09
+Description: ECS (Frontend) Service.
+Parameters:
+  ECSClusterName:
+    Type: String
+  TaskDefinitionFamily:
+    Type: String
+  ECSServiceName:
+    Type: String
+  DesiredCount:
+    Type: Number
+  ContainerName:
+    Type: String
+  ContainerPort:
+    Type: Number
+  TargetGroupArn:
+    Type: String
+  HealthCheckGracePeriodSeconds:
+    Type: Number
+  SecurityGroupIDs:
+    Type: CommaDelimitedList
+  SubnetIDs:
+    Type: CommaDelimitedList
+Resources:
+  ECSService:
+    Type: 'AWS::ECS::Service'
+    Properties:
+      Cluster: !Ref ECSClusterName
+      TaskDefinition: !Ref TaskDefinitionFamily
+      LaunchType: FARGATE
+      ServiceName: !Ref ECSServiceName
+      SchedulingStrategy: REPLICA
+      DesiredCount: !Ref DesiredCount
+      LoadBalancers:
+        - ContainerName: !Ref ContainerName
+          ContainerPort: !Ref ContainerPort
+          LoadBalancerName: !Ref 'AWS::NoValue'
+          TargetGroupArn: !Ref TargetGroupArn
+      HealthCheckGracePeriodSeconds: !Ref HealthCheckGracePeriodSeconds
+      NetworkConfiguration:
+        AwsvpcConfiguration:
+          AssignPublicIp: ENABLED
+          SecurityGroups: !Ref SecurityGroupIDs
+          Subnets: !Ref SubnetIDs
+      PlatformVersion: LATEST
+      DeploymentConfiguration:
+        MaximumPercent: 200
+        MinimumHealthyPercent: 100
+        DeploymentCircuitBreaker:
+          Enable: true
+          Rollback: true
+      DeploymentController:
+        Type: ECS
+      ServiceConnectConfiguration:
+        Enabled: false
+      Tags: []
+      EnableECSManagedTags: true
