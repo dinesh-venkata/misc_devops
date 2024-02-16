@@ -1,5 +1,5 @@
 #backup aws application type load balancer using aws cli commands
-#replace the values present inside <> (ex: <load-balancer-arn>) with your own values
+#note: replace the values present in <> (ex: <load-balancer-arn>) with your own values and without <>
 
 #describe load balancers
 aws elbv2 describe-load-balancers --load-balancer-arns <load-balancer-arn> --output json > <backup-name>-<load-balancer-name>-description.json

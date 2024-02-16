@@ -1,5 +1,5 @@
 #aws cli commands to create ecs (fargate) cluster using cloudformation templates
-#note: replace the values present in <> (ex: <your-vpc-id>) with your own values
+#note: replace the values present in <> (ex: <your-vpc-id>) with your own values and without <>
 
 #create ecs cluster
 aws cloudformation create-stack \
